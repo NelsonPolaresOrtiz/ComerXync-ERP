@@ -1,43 +1,47 @@
 <?php
+// Archivo: controllers/crearArticuloController.php
 session_start();
 require_once '../config/conexion.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $razon_social = trim($_POST['razon_social']);
-    $pais = trim($_POST['pais']);
-    $contacto = trim($_POST['contacto']);
-    $telefono = trim($_POST['telefono']);
-    $tiempo_entrega = isset($_POST['tiempo_entrega_dias']) ? (int)$_POST['tiempo_entrega_dias'] : 0;
+    $sku_vin = strtoupper(trim($_POST['sku_vin']));
+    $nombre = trim($_POST['nombre']);
+    $categoria = $_POST['categoria'];
+    $id_proveedor = !empty($_POST['id_proveedor']) ? $_POST['id_proveedor'] : null;
+    $precio_compra = $_POST['precio_compra'];
+    $precio_venta = $_POST['precio_venta'];
+    $stock_minimo = !empty($_POST['stock_minimo']) ? $_POST['stock_minimo'] : 5;
+    $imagen_url = trim($_POST['imagen_url'] ?? '');
 
-    if(empty($razon_social) || empty($pais)) {
-        die("Error: Razón Social y País son obligatorios.");
+    // Si dejan la imagen vacía, generamos un placeholder corporativo automático con el nombre del producto
+    if (empty($imagen_url)) {
+        $texto_url = urlencode(substr($nombre, 0, 18));
+        $imagen_url = "https://placehold.co/400x400/f8fafc/1e293b?text=" . $texto_url;
     }
 
     try {
         $database = new Conexion();
         $db = $database->getConnection();
 
-        $query = "INSERT INTO proveedores (razon_social, pais, contacto, telefono, tiempo_entrega_dias) 
-                  VALUES (:razon_social, :pais, :contacto, :telefono, :tiempo_entrega)";
+        $query = "INSERT INTO articulos (sku_vin, nombre, categoria, imagen_url, id_proveedor, precio_compra, precio_venta, stock_minimo) 
+                  VALUES (:sku_vin, :nombre, :categoria, :imagen_url, :id_proveedor, :precio_compra, :precio_venta, :stock_minimo)";
         
         $stmt = $db->prepare($query);
-        $stmt->bindParam(':razon_social', $razon_social);
-        $stmt->bindParam(':pais', $pais);
-        $stmt->bindParam(':contacto', $contacto);
-        $stmt->bindParam(':telefono', $telefono);
-        $stmt->bindParam(':tiempo_entrega', $tiempo_entrega);
+        $stmt->bindParam(':sku_vin', $sku_vin);
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':categoria', $categoria);
+        $stmt->bindParam(':imagen_url', $imagen_url);
+        $stmt->bindParam(':id_proveedor', $id_proveedor);
+        $stmt->bindParam(':precio_compra', $precio_compra);
+        $stmt->bindParam(':precio_venta', $precio_venta);
+        $stmt->bindParam(':stock_minimo', $stock_minimo);
 
-        if($stmt->execute()) {
-            header("Location: ../views/proveedores.php?exito=creado");
+        if ($stmt->execute()) {
+            header("Location: ../views/articulos.php?exito=creado");
             exit();
-        } else {
-            die("Error al guardar el proveedor.");
         }
-    } catch(PDOException $e) {
-        die("Error de Base de Datos: " . $e->getMessage());
+    } catch (PDOException $e) {
+        die("Error al registrar el artículo: " . $e->getMessage());
     }
-} else {
-    header("Location: ../views/proveedores.php");
-    exit();
 }
 ?>

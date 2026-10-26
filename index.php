@@ -1,58 +1,77 @@
+<?php
+// Archivo: index.php
+session_start();
+// Si ya había una sesión activa, lo mandamos directo al dashboard
+if(isset($_SESSION['usuario_id'])){
+    header("Location: views/dashboard.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - ComerXync AutoParts</title>
+    <title>Acceso Corporativo - ComerXync AutoParts</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Inter', sans-serif; } </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 h-screen flex items-center justify-center">
+<body class="bg-slate-950 h-screen w-screen flex items-center justify-center relative overflow-hidden">
 
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
+    <!-- Fondo Dinámico con Iluminación Ambiental (Efecto 3D / Profundidad) -->
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/30 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-amber-500/20 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <!-- Contenedor Principal del Login -->
+    <div class="relative z-10 w-full max-w-md p-8 rounded-3xl glass-card shadow-2xl mx-4">
         
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Comer<span class="text-amber-500">Xync</span></h1>
-            <p class="text-sm text-gray-500 mt-2 font-medium">ERP Automotriz y Maquinaria</p>
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600/20 text-blue-500 text-3xl font-black mb-4 border border-blue-500/30 shadow-[0_0_20px_rgba(37,99,235,0.3)]">
+                ⚙️
+            </div>
+            <h1 class="text-3xl font-black text-white tracking-tight">Comer<span class="text-amber-500">Xync</span></h1>
+            <p class="text-slate-400 text-xs uppercase tracking-widest mt-1 font-semibold">Plataforma ERP Automotriz</p>
         </div>
 
-        <!-- MÓDULO DE ALERTAS Y ERRORES -->
         <?php if(isset($_GET['error'])): ?>
-            <div class="mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded shadow-sm text-sm font-medium">
-                <?php 
-                    if($_GET['error'] == 'credenciales') echo "❌ Correo o contraseña incorrectos.";
-                    elseif($_GET['error'] == 'acceso_denegado') echo "🔒 Acceso denegado. No tienes permisos para ver esa pantalla.";
-                    elseif($_GET['error'] == 'nologin') echo "⚠️ Debes iniciar sesión para continuar.";
-                    else echo "Ocurrió un error. Intenta nuevamente.";
-                ?>
+            <div class="mb-6 bg-red-500/10 border border-red-500/20 text-red-400 text-xs px-4 py-3 rounded-xl text-center font-medium">
+                ⚠️ Credenciales incorrectas o sesión expirada.
             </div>
         <?php endif; ?>
 
-        <form action="controllers/loginController.php" method="POST" class="space-y-6">
+        <form action="controllers/loginController.php" method="POST" class="space-y-5">
             <div>
-                <label for="email" class="block text-sm font-semibold text-gray-700 mb-1">Correo Electrónico</label>
-                <input type="email" id="email" name="email" required 
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-800 focus:border-slate-800 outline-none transition-all"
-                    placeholder="admin@comerxync.com">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Correo Electrónico</label>
+                <input type="email" name="email" required placeholder="ejemplo@comerxync.com" 
+                    class="w-full px-4 py-3 bg-slate-900/80 border border-slate-800 rounded-xl text-white placeholder-slate-600 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
             </div>
 
             <div>
-                <label for="password" class="block text-sm font-semibold text-gray-700 mb-1">Contraseña</label>
-                <input type="password" id="password" name="password" required 
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-800 focus:border-slate-800 outline-none transition-all"
-                    placeholder="••••••••">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Contraseña de Acceso</label>
+                <input type="password" name="password" required placeholder="••••••••" 
+                    class="w-full px-4 py-3 bg-slate-900/80 border border-slate-800 rounded-xl text-white placeholder-slate-600 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
             </div>
 
             <button type="submit" 
-                class="w-full bg-slate-800 text-white font-bold py-3 rounded-lg hover:bg-slate-700 transition-colors duration-200 shadow-md">
-                Iniciar Sesión
+                class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-[0_0_25px_rgba(37,99,235,0.4)] transition-all duration-300 transform hover:scale-[1.02] text-sm tracking-wide">
+                Iniciar Sesión en el Sistema
             </button>
         </form>
 
-        <div class="mt-8 text-center text-xs text-gray-400 font-medium">
-            &copy; 2026 ComerXync Systems. Equipo USFX.
+        <div class="mt-8 pt-6 border-t border-slate-800/80 text-center">
+            <p class="text-xs text-slate-500">Universidad Mayor de San Francisco Xavier de Chuquisaca</p>
+            <p class="text-[10px] text-slate-600 mt-1">Ing. de Sistemas</p>
         </div>
     </div>
+
 </body>
 </html>
